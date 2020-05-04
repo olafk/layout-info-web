@@ -1,0 +1,4 @@
+Bundle-Name: layout-info-web
+Bundle-SymbolicName: de.olafkock.liferay.layoutinfo
+Bundle-Version: 1.0.0
+Export-Package: de.olafkock.liferay.layoutinfo.constants

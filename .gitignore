@@ -1,0 +1,8 @@
+.gradle/
+.sass-cache/
+build/
+target/
+.settings
+.classpath
+.project
+bin
