@@ -5,8 +5,8 @@
 <%@page import="javax.portlet.RenderRequest"%>
 <%@ include file="init.jsp" %>
 
-<h2>TypeSettings</h2>
-<pre><%=renderRequest.getAttribute("info") %></pre>
+<h2>TypeSettingsProps</h2>
+<%=renderRequest.getAttribute("props") %>
 <h2>Description</h2>
 <pre><%=renderRequest.getAttribute("desc") %></pre>
 <h2>PortletPreferences</h2>

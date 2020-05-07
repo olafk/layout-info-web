@@ -6,10 +6,13 @@ import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.PortletPreferencesLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 import javax.portlet.Portlet;
 import javax.portlet.PortletException;
@@ -35,7 +38,8 @@ import de.olafkock.liferay.layoutinfo.constants.LayoutInfoPortletKeys;
 		"javax.portlet.init-param.view-template=/view.jsp",
 		"javax.portlet.name=" + LayoutInfoPortletKeys.LAYOUTINFO,
 		"javax.portlet.resource-bundle=content.Language",
-		"javax.portlet.security-role-ref=power-user,user"
+		"javax.portlet.security-role-ref=power-user,user",
+		"javax.portlet.preferences=<preference><name>portletSetupPortletDecoratorId</name><value>barebone</value></preference>"
 	},
 	service = Portlet.class
 )
@@ -47,7 +51,29 @@ public class LayoutInfoPortlet extends MVCPortlet {
 		ThemeDisplay themeDisplay = (ThemeDisplay) renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
 
 		Layout layout = themeDisplay.getLayout();
-		renderRequest.setAttribute("info", layout.getTypeSettings());
+
+		UnicodeProperties props = layout.getTypeSettingsProperties();
+		StringBuffer sProps = new StringBuffer("<ul>");
+		Set<String> keys = props.keySet();
+		for (String key : keys) {
+			sProps.append("<li>");
+			sProps.append(key);
+			sProps.append("\n <ul>\n");
+			
+			String value = props.get(key);
+			String[] values = StringUtil.split(value);
+			for (int i = 0; i < values.length; i++) {
+				sProps.append("  <li>  ");
+				sProps.append(values[i]);
+				sProps.append("  </li>\n");
+			}
+			
+			sProps.append("</ul>");
+			sProps.append("</li>\n");
+		}
+		sProps.append("</ul>");
+		
+		renderRequest.setAttribute("props", sProps.toString());
 		renderRequest.setAttribute("desc", layout.getDescription());
 		
 		List<PortletPreferences> portletPreferencesByPlid = 
