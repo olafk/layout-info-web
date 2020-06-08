@@ -73,6 +73,10 @@ public class LayoutInfoPortlet extends MVCPortlet {
 		}
 		sProps.append("</ul>");
 		
+		renderRequest.setAttribute("layoutType", layout.getType());
+		renderRequest.setAttribute("layoutName", layout.getName(themeDisplay.getLocale()));
+		renderRequest.setAttribute("friendlyURL", layout.getFriendlyURL(themeDisplay.getLocale()));
+		
 		renderRequest.setAttribute("props", sProps.toString());
 		renderRequest.setAttribute("desc", layout.getDescription());
 		
