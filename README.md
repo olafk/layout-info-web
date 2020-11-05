@@ -12,3 +12,4 @@ Currently includes:
 
 * Clone this repository into a Liferay Workspace's `modules` directory
 * Tested with Target Platform 7.2.10.1
+* Also builds/deploys with `liferay.workspace.product=dxp-7.3-ga1`
