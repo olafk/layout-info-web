@@ -8,12 +8,14 @@ import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.PortletPreferenceValueLocalService;
 import com.liferay.portal.kernel.service.PortletPreferencesLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -112,7 +114,7 @@ public class LayoutInfoPortlet extends MVCPortlet {
 			sb.append("<li>ctCollectionId=").append(p.getCtCollectionId()).append("</li>");
 			sb.append("<li>mvccVersion=").append(p.getMvccVersion()).append("</li>");
 			sb.append("<li>ownerId=").append(p.getOwnerId()).append("</li>");
-			sb.append("<li>ownerType=").append(p.getOwnerType()).append("</li>");
+			sb.append("<li>ownerType=").append(getOwnerType(p.getOwnerType())).append("</li>");
 			sb.append("<li>plid=").append(p.getPlid()).append("</li>");
 
 			sb.append("</ul>");
@@ -121,6 +123,25 @@ public class LayoutInfoPortlet extends MVCPortlet {
 		renderRequest.setAttribute("portletPreferences", sb.toString());
 		super.doView(renderRequest, renderResponse);
 	}
+	
+	private String getOwnerType(int numericOwnerType) {
+		if(OWNER_TYPE_NAMES.containsKey(numericOwnerType)) {
+			return "" + numericOwnerType + " " + OWNER_TYPE_NAMES.get(numericOwnerType);
+		}
+		return "" + numericOwnerType + " (unknown)";
+	}
+	
+	static final HashMap<Integer, String> OWNER_TYPE_NAMES = new HashMap<Integer, String>();
+	
+	{ 
+		OWNER_TYPE_NAMES.put( PortletKeys.PREFS_OWNER_TYPE_ARCHIVED, "(archived)");
+		OWNER_TYPE_NAMES.put( PortletKeys.PREFS_OWNER_TYPE_COMPANY, "(company)");
+		OWNER_TYPE_NAMES.put( PortletKeys.PREFS_OWNER_TYPE_GROUP, "(group)");
+		OWNER_TYPE_NAMES.put( PortletKeys.PREFS_OWNER_TYPE_LAYOUT, "(layout)");
+		OWNER_TYPE_NAMES.put( PortletKeys.PREFS_OWNER_TYPE_ORGANIZATION, "(organization)");
+		OWNER_TYPE_NAMES.put( PortletKeys.PREFS_OWNER_TYPE_USER, "(user)");
+	}
+
 	
 	@Reference(unbind="-") 
 	LayoutLocalService layoutLocalService;
