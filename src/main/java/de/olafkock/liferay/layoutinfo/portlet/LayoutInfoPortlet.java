@@ -2,16 +2,21 @@ package de.olafkock.liferay.layoutinfo.portlet;
 
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.PortletPreferences;
+import com.liferay.portal.kernel.portlet.PortletPreferencesFactory;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.service.LayoutLocalService;
+import com.liferay.portal.kernel.service.PortletPreferenceValueLocalService;
 import com.liferay.portal.kernel.service.PortletPreferencesLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.portlet.Portlet;
@@ -78,13 +83,42 @@ public class LayoutInfoPortlet extends MVCPortlet {
 		renderRequest.setAttribute("friendlyURL", layout.getFriendlyURL(themeDisplay.getLocale()));
 		
 		renderRequest.setAttribute("props", sProps.toString());
-		renderRequest.setAttribute("desc", layout.getDescription());
+		if(layout.getDescription()==null || layout.getDescription().equals("")) {
+			renderRequest.setAttribute("desc", "<i>empty</i>");
+		} else {
+			renderRequest.setAttribute("desc", layout.getDescription());
+		}
 		
 		List<PortletPreferences> portletPreferencesByPlid = 
 				ppls.getPortletPreferencesByPlid(
 						layout.getPlid());
-		renderRequest.setAttribute("portletPreferences", portletPreferencesByPlid);
+		StringBundler sb = new StringBundler();
+		for (PortletPreferences p : portletPreferencesByPlid) {
+			sb.append("<h3>").append(p.getPortletId()).append("</h3>").append("<ul>");
+			sb.append("<li>PortletPreferences:<ul>");
+			javax.portlet.PortletPreferences preferences = ppvlc.getPreferences(p);
+			Map<String, String[]> map = preferences.getMap();
+			Set<Entry<String, String[]>> entrySet = map.entrySet();
+			for (Entry<String, String[]> entry : entrySet) {
+				sb.append("<li>").append(entry.getKey()).append("=").append(entry.getValue()).append("</li>");
+			}
+			if(map.isEmpty()) {
+				sb.append("<li><i>empty</i></li>");
+			}
+			
+			sb.append("</ul></li>");
 
+			sb.append("<li>companyId=").append(p.getCompanyId()).append("</li>");
+			sb.append("<li>ctCollectionId=").append(p.getCtCollectionId()).append("</li>");
+			sb.append("<li>mvccVersion=").append(p.getMvccVersion()).append("</li>");
+			sb.append("<li>ownerId=").append(p.getOwnerId()).append("</li>");
+			sb.append("<li>ownerType=").append(p.getOwnerType()).append("</li>");
+			sb.append("<li>plid=").append(p.getPlid()).append("</li>");
+
+			sb.append("</ul>");
+		}
+		
+		renderRequest.setAttribute("portletPreferences", sb.toString());
 		super.doView(renderRequest, renderResponse);
 	}
 	
@@ -93,5 +127,11 @@ public class LayoutInfoPortlet extends MVCPortlet {
 	
 	@Reference(unbind="-")
 	PortletPreferencesLocalService ppls;
+
+	@Reference(unbind="-")
+	PortletPreferenceValueLocalService ppvlc;
+	
+	@Reference
+	PortletPreferencesFactory ppf;
 	
 }
