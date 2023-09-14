@@ -10,6 +10,9 @@
 <li>layoutName=<%=renderRequest.getAttribute("layoutName") %></li>
 <li>layoutType=<%=renderRequest.getAttribute("layoutType") %></li>
 <li>friendlyURL=<%=renderRequest.getAttribute("friendlyURL") %></li>
+<li>stylebookEntryId=<%=renderRequest.getAttribute("styleBookEntryId") %></li>
+<li>stylebookName=<%=renderRequest.getAttribute("styleBookEntryName") %></li>
+<li>frontendTokens=<%=renderRequest.getAttribute("styleBookTokens") %></li>
 <li>plid=<%=plid %></li>
 </ul>
 

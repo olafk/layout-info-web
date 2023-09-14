@@ -1,5 +1,8 @@
 package de.olafkock.liferay.layoutinfo.portlet;
 
+import com.liferay.frontend.token.definition.FrontendToken;
+import com.liferay.frontend.token.definition.FrontendTokenDefinition;
+import com.liferay.frontend.token.definition.FrontendTokenDefinitionRegistry;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.PortletPreferences;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactory;
@@ -13,13 +16,17 @@ import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.style.book.model.StyleBookEntry;
+import com.liferay.style.book.util.DefaultStyleBookEntryUtil;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.portlet.Portlet;
 import javax.portlet.PortletException;
@@ -82,6 +89,21 @@ public class LayoutInfoPortlet extends MVCPortlet {
 		
 		renderRequest.setAttribute("layoutType", layout.getType());
 		renderRequest.setAttribute("layoutName", layout.getName(themeDisplay.getLocale()));
+		renderRequest.setAttribute("styleBookEntryId", layout.getStyleBookEntryId());
+		try {
+			FrontendTokenDefinition frontendTokenDefinition = _frontendTokenDefinitionRegistry.getFrontendTokenDefinition(layout.getThemeId());
+			Collection<FrontendToken> tokens = frontendTokenDefinition.getFrontendTokens();
+		    String tokensString = tokens.stream()
+		    	      .map(n -> n.getName())
+		    	      .collect(Collectors.joining(", ", "{", "}"));
+		    	 
+			renderRequest.setAttribute("styleBookTokens", tokensString);
+			StyleBookEntry styleBookEntry = DefaultStyleBookEntryUtil.getDefaultMasterStyleBookEntry(themeDisplay.getLayout());
+			renderRequest.setAttribute("styleBookEntryName", styleBookEntry.getName());
+			
+		} catch (Exception e) {
+			renderRequest.setAttribute("styleBookEntryName", e.getClass().getName() + " " + e.getMessage());
+		}
 		renderRequest.setAttribute("friendlyURL", layout.getFriendlyURL(themeDisplay.getLocale()));
 		
 		renderRequest.setAttribute("props", sProps.toString());
@@ -151,6 +173,9 @@ public class LayoutInfoPortlet extends MVCPortlet {
 
 	@Reference(unbind="-")
 	PortletPreferenceValueLocalService ppvlc;
+	
+	@Reference
+	private FrontendTokenDefinitionRegistry _frontendTokenDefinitionRegistry;
 	
 	@Reference
 	PortletPreferencesFactory ppf;
