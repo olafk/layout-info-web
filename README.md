@@ -2,6 +2,8 @@
 
 A simple widget to show technical information about the current page.
 
+Use it to explore the page/layout API, and the various settings that are otherwise hard to discover. Also good for String-Maps and configuration settings, that might not be documented other than in source code.
+
 Currently includes:
 
 * A page's typeSettings (e.g. including the different columns and their contents, meta information)
@@ -11,5 +13,6 @@ Currently includes:
 ## Build instructions
 
 * Clone this repository into a Liferay Workspace's `modules` directory
-* Tested with Target Platform 7.2.10.1
-* Also builds/deploys with `liferay.workspace.product=dxp-7.3-ga1`
+* Originally built with Target Platform 7.2.10.1
+* In the past also built with `liferay.workspace.product=dxp-7.3-ga1`
+* Currently, version last built with `liferay.workspace.product=dxp-7.4-u102`
