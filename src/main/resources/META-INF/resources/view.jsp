@@ -13,6 +13,12 @@
 <li>stylebookEntryId=<%=renderRequest.getAttribute("styleBookEntryId") %></li>
 <li>stylebookName=<%=renderRequest.getAttribute("styleBookEntryName") %></li>
 <li>frontendTokens=<%=renderRequest.getAttribute("styleBookTokens") %></li>
+<li>ancestorLayoutId=<%=renderRequest.getAttribute("ancestorLayoutId") %></li>
+<li>ancestorPlid=<%=renderRequest.getAttribute("ancestorPlid") %></li>
+<li>layoutPrototypeUuid=<%=renderRequest.getAttribute("layoutPrototypeUuid") %></li>
+<li>masterLayoutPlid=<%=renderRequest.getAttribute("masterLayoutPlid") %></li>
+<li>parentLayoutId=<%=renderRequest.getAttribute("parentLayoutId") %></li>
+<li>parentLayoutPlid=<%=renderRequest.getAttribute("parentLayoutPlid") %></li>
 <li>plid=<%=plid %></li>
 </ul>
 

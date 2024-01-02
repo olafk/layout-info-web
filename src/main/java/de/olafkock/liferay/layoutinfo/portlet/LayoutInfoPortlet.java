@@ -3,6 +3,8 @@ package de.olafkock.liferay.layoutinfo.portlet;
 import com.liferay.frontend.token.definition.FrontendToken;
 import com.liferay.frontend.token.definition.FrontendTokenDefinition;
 import com.liferay.frontend.token.definition.FrontendTokenDefinitionRegistry;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.PortletPreferences;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactory;
@@ -23,6 +25,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -59,6 +62,8 @@ import de.olafkock.liferay.layoutinfo.constants.LayoutInfoPortletKeys;
 )
 public class LayoutInfoPortlet extends MVCPortlet {
 	
+	private static final String JAVAX_PORTLET_TITLE = "javax.portlet.title.";
+
 	@Override
 	public void doView(RenderRequest renderRequest, RenderResponse renderResponse)
 			throws IOException, PortletException {
@@ -90,6 +95,20 @@ public class LayoutInfoPortlet extends MVCPortlet {
 		renderRequest.setAttribute("layoutType", layout.getType());
 		renderRequest.setAttribute("layoutName", layout.getName(themeDisplay.getLocale()));
 		renderRequest.setAttribute("styleBookEntryId", layout.getStyleBookEntryId());
+		renderRequest.setAttribute("layoutPrototypeUuid", layout.getLayoutPrototypeUuid());
+		renderRequest.setAttribute("masterLayoutPlid", layout.getMasterLayoutPlid());
+		renderRequest.setAttribute("parentLayoutId", layout.getParentLayoutId());
+		renderRequest.setAttribute("parentLayoutPlid", layout.getParentPlid());
+		try {
+			renderRequest.setAttribute("ancestorPlid", layout.getAncestorPlid());
+		} catch (PortalException e1) {
+			renderRequest.setAttribute("ancestorPlid", e1.getClass().getName() + " " + e1.getMessage());
+		}
+		try {
+			renderRequest.setAttribute("ancestorLayoutId", layout.getAncestorLayoutId());
+		} catch (PortalException e1) {
+			renderRequest.setAttribute("ancestorLayoutId", e1.getClass().getName() + " " + e1.getMessage());
+		}
 		try {
 			FrontendTokenDefinition frontendTokenDefinition = _frontendTokenDefinitionRegistry.getFrontendTokenDefinition(layout.getThemeId());
 			Collection<FrontendToken> tokens = frontendTokenDefinition.getFrontendTokens();
@@ -118,7 +137,8 @@ public class LayoutInfoPortlet extends MVCPortlet {
 						layout.getPlid());
 		StringBundler sb = new StringBundler();
 		for (PortletPreferences p : portletPreferencesByPlid) {
-			sb.append("<h3>").append(p.getPortletId()).append("</h3>").append("<ul>");
+			sb.append("<h3>").append(getPortletName(p.getPortletId(), themeDisplay.getLocale())).append("</h3>").append("<ul>");
+			sb.append("<li>PortletId=").append(p.getPortletId()).append("</li>");
 			sb.append("<li>PortletPreferences:<ul>");
 			javax.portlet.PortletPreferences preferences = ppvlc.getPreferences(p);
 			Map<String, String[]> map = preferences.getMap();
@@ -146,6 +166,20 @@ public class LayoutInfoPortlet extends MVCPortlet {
 		super.doView(renderRequest, renderResponse);
 	}
 	
+	private String getPortletName(String portletId, Locale locale) {
+		String result = portletId;
+		int instanceIndex = portletId.indexOf("_INSTANCE_");
+		if(instanceIndex>=0) {
+			result = LanguageUtil.get(locale, JAVAX_PORTLET_TITLE + portletId.substring(0, instanceIndex));
+		} else {
+			result = LanguageUtil.get(locale, JAVAX_PORTLET_TITLE + portletId);
+		}
+		if(result.startsWith(JAVAX_PORTLET_TITLE)) {
+			result = result.substring(JAVAX_PORTLET_TITLE.length());
+		}
+		return result;
+	}
+
 	private String getOwnerType(int numericOwnerType) {
 		if(OWNER_TYPE_NAMES.containsKey(numericOwnerType)) {
 			return "" + numericOwnerType + " " + OWNER_TYPE_NAMES.get(numericOwnerType);
